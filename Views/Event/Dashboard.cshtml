@@ -1,0 +1,102 @@
+﻿@model SmartEventPlanningPlatform.Controllers.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartEventPlanningPlatform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<div class="container mt-4">
+    <h1 class="mb-4 text-center">Etkinliklerin</h1>
+
+    <div class="row">
+        <!-- Sol tarafta takvim -->
+        <div class="col-md-6">
+            <div id="calendar" class="mb-4"></div>
+        </div>
+
+        <!-- Sağ tarafta oluşturulan etkinlikler -->
+        <div class="col-md-6">
+            <div>
+                <h3 class="section-title">Oluşturduğunuz Etkinlikler</h3>
+                <div class="scroll-panel">
+                    <ul class="list-group">
+                        @foreach (var eventItem in Model.UserCreatedEvents)
+                        {
+                            
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="@Url.Action("Index", "Event", new { eventId = eventItem.EventId })" class="text-decoration-none">@eventItem.Title</a>
+                                        </h5>
+                                        <p class="card-text">@eventItem.Description</p>
+                                        <small class="text-muted">Tarih: @eventItem.StartDate.ToString("dd/MM/yyyy")</small>
+                                    </div>
+                                </div>
+                            
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alt kısımda katılınan etkinlikler -->
+    <div class="mt-5">
+        <h3 class="section-title">Katıldığınız / Başvurduğunuz Etkinlikler</h3>
+        <div class="scroll-panel">
+            <ul class="list-group">
+                @foreach (var eventItem in Model.UserJoinedEvents)
+                {
+                    
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="@Url.Action("Index", "Event", new { eventId = eventItem.EventId })" class="text-decoration-none">@eventItem.Title</a>
+                                </h5>
+                                <p class="card-text">@eventItem.Description</p>
+                                <small class="text-muted">Tarih: @eventItem.StartDate.ToString("dd/MM/yyyy")</small>
+                            </div>
+                        </div>
+                    
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            if (calendarEl) {
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    locale: 'tr',
+                    events: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CalendarEvents.Select(e => new
+            {
+                title = e.Title,
+                start = e.StartDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                end = e.EndDate.ToString("yyyy-MM-ddTHH:mm:ss")
+            }))),
+
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    slotMinTime: "08:00:00",
+                    slotMaxTime: "20:00:00"
+                });
+                calendar.render();
+            } else {
+                console.error("Takvim DOM'da bulunamadı.");
+            }
+        });
+    </script>
+}

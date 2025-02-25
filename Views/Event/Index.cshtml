@@ -1,0 +1,321 @@
+﻿@model SmartEventPlanningPlatform.Controllers.EventIndexViewModel
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartEventPlanningPlatform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+
+@{
+    ViewData["Title"] = "Event Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="event-title text-center">@Model.Event.Title</h2>
+
+    @if (Model != null)
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <div class="event-details">
+                    <h4>Açıklama</h4>
+                    <p>@Model.Event.Description</p>
+                    <h4>Adres</h4>
+                    <p>@Model.Event.Location</p>
+                    <h4>Başlangıç Zamanı</h4>
+                    <p>@Model.Event.StartDate.ToShortDateString()</p>
+                    <h4>Bitiş Zamanı</h4>
+                    <p>@Model.Event.EndDate.ToShortDateString()</p>
+                    <h4>Etkinlik Sahibi</h4>
+                    <div class="event-owner">
+                        <img src="@Model.Owner.ProfilePictureUrl" alt="@Model.Owner.Username" class="profile-img-small" />
+                        <span>@Model.Owner.Username</span>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <a asp-action="Messages" asp-controller="Event" asp-route-eventId="@Model.Event.EventId" class="btn btn-primary btn-custom">Etkinlik Sohbetine Katıl</a>
+                </div>
+                <div id="map" class="map-container"></div>
+                <div class="text-center mb-4">
+                    @if (Model.ParticipationStatus == "Beklemede")
+                    {
+                        <form asp-action="CancelJoinRequest" asp-controller="Event" method="post" style="display: inline;">
+                            <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+                            <button type="submit" class="btn btn-warning btn-custom">İsteği İptal Et</button>
+                        </form>
+                    }
+                    else if (Model.ParticipationStatus == "Onaylandı")
+                    {
+                        <form asp-action="CancelJoinRequest" asp-controller="Event" method="post" style="display: inline;">
+                            <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+                            <button type="submit" class="btn btn-danger btn-custom">Etkinlikten Ayrıl</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form id="joinRequestForm" asp-action="JoinEvent" asp-controller="Event" method="post" style="display: inline;">
+                            <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+                            <button type="submit" class="btn btn-primary btn-custom">Katılma İsteği Gönder</button>
+                        </form>
+                    }
+
+                    @if (Model.IsOwner)
+                    {
+                        <a asp-action="Edit" asp-controller="Event" asp-route-id="@Model.Event.EventId" class="btn btn-warning btn-custom">Etkinliği Düzenle</a>
+                        <form asp-action="Delete" asp-controller="Event" method="post" style="display: inline;">
+                            <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+                            <button type="submit" class="btn btn-danger btn-custom">Etkinliği Sil</button>
+                        </form>
+                    }
+                </div>
+            </div>
+
+            <!-- Katılma İstekleri -->
+            
+                <div class="col-md-4">
+                @if (Model.IsOwner)
+                {
+                    <div class="participation-requests">
+                        <h3 class="text-center">Katılma İstekleri</h3>
+                        <div class="scroll-panel">
+                            <table class="table">
+                                <tbody>
+                                    @if (Model.JoinRequests != null)
+                                    {
+                                        foreach (var request in Model.JoinRequests)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <img src="@request.User.ProfilePictureUrl" alt="@request.User.Username" class="profile-img-small" />
+                                                    <a asp-action="Profile" asp-controller="User" asp-route-userId="@request.User.UserId">
+                                                        @request.User.Username
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <form asp-action="AcceptJoinRequest" asp-controller="Event" method="post" style="display: inline;">
+                                                        <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+                                                        <input type="hidden" name="userId" value="@request.User.UserId" />
+                                                        <button type="submit" class="btn btn-success btn-custom">Kabul Et</button>
+                                                    </form>
+                                                    <form asp-action="RejectJoinRequest" asp-controller="Event" method="post" style="display: inline;">
+                                                        <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+                                                        <input type="hidden" name="userId" value="@request.User.UserId" />
+                                                        <button type="submit" class="btn btn-danger btn-custom">Reddet</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="2" class="text-center">Henüz katılma isteği yok.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+                    <!-- Katılımcılar Listesi -->
+                    <div class="participation-list">
+                        <h3 class="text-center mt-4">Katılımcılar</h3>
+                        <div class="scroll-panel">
+                            <table class="table">
+                                <tbody>
+                                    @if (Model.ParticipantUsers != null && Model.ParticipantUsers.Count > 0)
+                                    {
+                                        foreach (var participant in Model.ParticipantUsers)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <img src="@participant.ProfilePictureUrl" alt="@participant.Username" class="profile-img-small" />
+                                                    <a asp-action="Profile" asp-controller="User" asp-route-userId="@participant.UserId">
+                                                        @participant.Username
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="1" class="text-center">Henüz katılımcı yok.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                
+                    </div>
+                
+                </div>
+            
+
+        </div>
+    }
+    else
+    {
+        <p class="text-danger text-center">Etkinlik Bulunamadı.</p>
+    }
+</div>
+
+<!-- CSS -->
+<style>
+    .scroll-panel {
+        max-height: 600px;
+        overflow-y: auto;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+        .scroll-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scroll-panel::-webkit-scrollbar-thumb {
+            background-color: #007bff;
+            border-radius: 5px;
+        }
+
+        .scroll-panel::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+        }
+
+    .profile-img-small {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .event-owner img {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+</style>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB0tZxPMNvJ7zwUAmCegFT1k6_Rg7A0dA"></script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("sa")
+        const form = document.querySelector('#joinRequestForm');
+        if (form) {
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault(); // Prevent default form submission
+                const formData = new FormData(this);
+
+                try {
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            
+                            location.reload();
+                        } else {
+                            alert(result.message);
+                        }
+                    } else {
+                        console.error('Error:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+    });
+   document.addEventListener('DOMContentLoaded', function () {
+        const eventLat = @Model.Event.Latitude;
+        const eventLng = @Model.Event.Longitude;
+        let userLat = @Model.User.Latitude;
+        let userLng = @Model.User.Longitude;
+
+        // Fallback mekanizması için bir bayrak
+        let fallbackToProfile = false;
+
+        
+         initializeMap(eventLat, eventLng, userLat, userLng);
+               
+        // Harita başlatma fonksiyonu
+        function initializeMap(eventLat, eventLng, userLat, userLng) {
+            console.log('Event Coordinates:', eventLat, eventLng);
+console.log('User Coordinates:', userLat, userLng);
+
+            const map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: eventLat, lng: eventLng },
+                zoom: 13
+            });
+
+            // Etkinlik için bir marker ekle
+            const eventMarker = new google.maps.Marker({
+                position: { lat: eventLat, lng: eventLng },
+                map: map,
+                title: "Event Location"
+            });
+
+            // Kullanıcı için bir marker ekle
+            const userMarker = new google.maps.Marker({
+                position: { lat: userLat, lng: userLng },
+                map: map,
+                title: fallbackToProfile ? "Profile Location (Default)" : "Your Location",
+                icon: {
+                    url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                }
+            });
+
+            // Rota çizimi
+            const directionsService = new google.maps.DirectionsService();
+            const directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map);
+
+            const request = {
+                origin: { lat: userLat, lng: userLng },
+                destination: { lat: eventLat, lng: eventLng },
+                travelMode: google.maps.TravelMode.DRIVING // Alternatifler: WALKING, BICYCLING
+            };
+
+            directionsService.route(request, function (result, status) {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+                } 
+                else if (status === google.maps.DirectionsStatus.ZERO_RESULTS) {
+    alert('Bu konumlar arası uygun rota bulunamadı.');
+    const userMarker = new google.maps.Marker({
+        position: { lat: userLat, lng: userLng },
+        map: map,
+        title: "Your Location",
+        icon: {
+            url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        }
+    });
+
+    const eventMarker = new google.maps.Marker({
+        position: { lat: eventLat, lng: eventLng },
+        map: map,
+        title: "Event Location"
+    });
+}
+
+                else {
+
+                    console.error('Directions request failed due to ' + status);
+                }
+            });
+        }
+    });
+</script>

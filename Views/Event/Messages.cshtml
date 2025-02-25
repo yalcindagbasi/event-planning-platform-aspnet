@@ -1,0 +1,54 @@
+﻿@model int // Selected EventId (Etkinlik ID'si)
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartEventPlanningPlatform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+@section Scripts {
+    <script>
+        // Mesajları yükle
+        function loadMessages() {
+            $.get(`/api/Message/GetMessagesByEvent/${@Model}`, function (data) {
+                let chatWindow = $('#chatWindow');
+                chatWindow.empty();
+                data.forEach(message => {
+                    chatWindow.append(`<div><strong>${message.senderName}:</strong> ${message.content}<br><small>${message.sentAt}</small></div><hr>`);
+                });
+            });
+        }
+
+        // Mesaj gönder
+        function sendMessage() {
+            const content = $('#messageContent').val();
+            $.ajax({
+                url: '/api/Message/SendMessage',
+                type: 'POST',
+                contentType: 'application/json', // JSON formatında veri gönder
+                data: JSON.stringify({ EventId: @Model, Content: content }), // JSON stringe çevir
+                success: function () {
+                    $('#messageContent').val('');
+                    loadMessages();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Mesaj gönderilemedi:', xhr.responseText || error);
+                }
+            });
+        }
+        $(document).ready(function () {
+            loadMessages(); // Sayfa yüklendiğinde mesajları çağır
+            setInterval(loadMessages, 5000); // Her 5 saniyede bir mesajları güncelle
+        });
+
+    </script>
+}
+
+<div class="container">
+    <div class="chat-window" id="chatWindow" style="height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
+        <!-- Mesajlar burada dinamik olarak yüklenecek -->
+    </div>
+
+    <textarea id="messageContent" class="form-control" placeholder="Type your message"></textarea>
+    <button class="btn btn-primary mt-2" onclick="sendMessage()">Send</button>
+</div>

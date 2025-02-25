@@ -1,0 +1,86 @@
+﻿@model SmartEventPlanningPlatform.Models.Event
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartEventPlanningPlatform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+@{
+    ViewData["Title"] = "Event Details";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="event-title text-center">@Model.Title</h2>
+
+    @if (Model != null)
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <div class="event-details">
+                    <h4>Açıklama</h4>
+                    <p>@Model.Description</p>
+                    <h4>Konum</h4>
+                    <p>@Model.Location</p>
+                    <h4>Başlangıç Zamanı</h4>
+                    <p>@Model.StartDate.ToShortDateString()</p>
+                    <h4>Bitiş Zamanı</h4>
+                    <p>@Model.EndDate.ToShortDateString()</p>
+                </div>
+                <div id="map" class="map-container"></div>
+            </div>
+            
+        </div>
+    }
+    else
+    {
+        <p class="text-danger text-center">Etkinlik bulunamadı.</p>
+    }
+</div>
+
+<!-- CSS -->
+<style>
+    .scroll-panel {
+        max-height: 600px;
+        overflow-y: auto;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .scroll-panel::-webkit-scrollbar {
+        width: 8px;
+    }
+    .scroll-panel::-webkit-scrollbar-thumb {
+        background-color: #007bff;
+        border-radius: 5px;
+    }
+    .scroll-panel::-webkit-scrollbar-track {
+        background-color: #f1f1f1;
+    }
+</style>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB0tZxPMNvJ7zwUAmCegFT1k6_Rg7A0dA"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const eventLat = @Model.Latitude;
+        const eventLng = @Model.Longitude;
+
+        initializeMap(eventLat, eventLng);
+
+        function initializeMap(eventLat, eventLng) {
+            const map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: eventLat, lng: eventLng },
+                zoom: 13
+            });
+
+            const eventMarker = new google.maps.Marker({
+                position: { lat: eventLat, lng: eventLng },
+                map: map,
+                title: "Event Location"
+            });
+        }
+    });
+</script>

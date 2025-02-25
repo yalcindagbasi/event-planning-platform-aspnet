@@ -1,0 +1,66 @@
+﻿@model EventMessageViewModel
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "Event Messages";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartEventPlanningPlatform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<div class="container">
+    <div class="row">
+        <!-- Sol Panel: Etkinlik Listesi -->
+        <div class="col-md-3">
+            <h4>My Events</h4>
+            <ul class="list-group">
+                @foreach (var eventItem in Model.Events)
+                {
+                    <li class="list-group-item">
+                        <a asp-action="ViewMessages" asp-controller="Event" asp-route-id="@eventItem.EventId">
+                            @eventItem.Title
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <!-- Orta Panel: Mesajlaşma Alanı -->
+        <div class="col-md-9">
+            <h4>@Model.SelectedEvent?.Title</h4>
+            <div class="chat-window" style="border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll;">
+                @if (Model.Messages != null && Model.Messages.Any())
+                {
+                    @foreach (var message in Model.Messages)
+                    {
+                        <div class="message">
+                            <strong>@message.SenderName:</strong>
+                            <span>@message.Content</span>
+                            <br />
+                            <small class="text-muted">@message.SentAt.ToString("g")</small>
+                        </div>
+                        <hr />
+                    }
+                }
+                else
+                {
+                    <p>No messages yet.</p>
+                }
+            </div>
+
+            <!-- Mesaj Gönderme Alanı -->
+            <form asp-action="SendMessage" asp-controller="Event" method="post">
+                <input type="hidden" name="EventId" value="@Model.SelectedEvent?.EventId" />
+                <div class="form-group">
+                    <textarea name="Content" class="form-control" rows="3" placeholder="Type your message here..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        </div>
+    </div>
+</div>

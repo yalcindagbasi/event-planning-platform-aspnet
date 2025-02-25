@@ -1,0 +1,43 @@
+﻿@model IEnumerable<SmartEventPlanningPlatform.Models.Event>
+
+@{
+    ViewData["Title"] = "Etkinlikler";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1 class="text-center mb-4">Etkinlik Yönetimi</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Başlık</th>
+                        <th>Başlangıç Tarihi</th>
+                        <th>Bitiş Tarihi</th>
+                        <th>Konum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var eventItem in Model)
+                    {
+                        <tr>
+                            <td>@eventItem.Title</td>
+                            <td>@eventItem.StartDate.ToString("dd/MM/yyyy")</td>
+                            <td>@eventItem.EndDate.ToString("dd/MM/yyyy")</td>
+                            <td>@eventItem.Location</td>
+                            <td>
+                                <!-- Silme butonu -->
+                                <form method="post" action="@Url.Action("DeleteEvent", "Admin", new { id = eventItem.EventId })" onsubmit="return confirm('Bu etkinliği silmek istediğinize emin misiniz?');">
+                                    <button type="submit" class="btn btn-danger">Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

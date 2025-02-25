@@ -1,0 +1,155 @@
+﻿<!-- Views/Account/Register.cshtml -->
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartEventPlanningPlatform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<h2>Kayıt Ol</h2>
+<form asp-action="Register" method="post">
+    <div class="form-group">
+        <label for="Username">Kullanıcı Adı</label>
+        <input type="text" class="form-control" id="Username" name="username" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Password">Şifre</label>
+        <input type="password" class="form-control" id="Password" name="password" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Email">E-posta</label>
+        <input type="email" class="form-control" id="Email" name="email" required />
+    </div>
+
+    <div class="form-group">
+        <label for="FirstName">Ad</label>
+        <input type="text" class="form-control" id="FirstName" name="firstName" required />
+    </div>
+
+    <div class="form-group">
+        <label for="LastName">Soyad</label>
+        <input type="text" class="form-control" id="LastName" name="lastName" required />
+    </div>
+
+    <div class="form-group">
+        <label for="PhoneNumber">Telefon Numarası</label>
+        <input type="text" class="form-control" id="PhoneNumber" name="phoneNumber" />
+    </div>
+
+    <div class="form-group">
+        <label for="Location">Konum</label>
+        <input type="text" class="form-control" id="Location" name="location" />
+    </div>
+
+    <div class="form-group">
+        <label for="Interests">Hakkında</label>
+        <textarea class="form-control" id="AboutMe" name="aboutme"></textarea>
+    </div>
+    <label for="Interests">İlgi Alanları</label>
+    <div id="interests">
+        @foreach (var interest in ViewBag.Interests as List<string>)
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="SelectedInterests" value="@interest" id="@interest">
+                <label class="form-check-label" for="@interest">@interest</label>
+            </div>
+        }
+    </div>
+
+    <div class="form-group">
+        <label for="BirthDate">Doğum Tarihi</label>
+        <input type="date" class="form-control" id="BirthDate" name="birthDate" />
+    </div>
+
+    <div class="form-group">
+        <label for="Gender">Cinsiyet</label>
+        <select class="form-control" id="Gender" name="gender">
+            <option value="Erkek">Erkek</option>
+            <option value="Kadın">Kadın</option>
+            <option value="Diğer">Diğer</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="ProfilePictureUrl">Profil Fotoğrafı URL</label>
+        <input type="text" class="form-control" id="ProfilePictureUrl" name="profilePictureUrl" />
+    </div>
+
+    <label for="Location">Konum</label>
+    <input type="hidden" class="form-control" id="Latitude" name="latitude" />
+    <input type="hidden" class="form-control" id="Longitude" name="longitude" />
+    <div id="map" style="height: 400px; width: 100%;"></div>
+    <small class="form-text text-muted">Haritadan konumunuzu seçin veya konum izni verin.</small>
+
+    <button type="submit" class="btn btn-primary">Kaydol</button>
+</form>
+<div class="mt-3">
+    <label>Zaten bir hesabın var mı?</label>
+    <a href="@Url.Action("Login", "Account")" class="btn btn-secondary">Giriş Yap</a>
+</div>
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB0tZxPMNvJ7zwUAmCegFT1k6_Rg7A0dA"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const defaultLat = 40.768614;
+        const defaultLng = 29.940151;
+        let map, marker;
+
+        function initMap(lat, lng) {
+            const initialPosition = { lat: lat, lng: lng };
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: initialPosition,
+                zoom: 13,
+            });
+
+            // Key change: Add click event to the map to update marker position
+            map.addListener("click", function (event) {
+                marker.setPosition(event.latLng);
+                updateCoordinates(event.latLng.lat(), event.latLng.lng());
+            });
+
+            marker = new google.maps.Marker({
+                position: initialPosition,
+                map: map,
+                draggable: true, // Ensure marker is draggable
+            });
+
+            // Keep the existing dragend listener
+            marker.addListener("dragend", function (event) {
+                updateCoordinates(event.latLng.lat(), event.latLng.lng());
+            });
+        }
+
+        function updateCoordinates(lat, lng) {
+            document.getElementById("Latitude").value = lat;
+            document.getElementById("Longitude").value = lng;
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    initMap(userLat, userLng);
+                    updateCoordinates(userLat, userLng);
+                },
+                function () {
+                    initMap(defaultLat, defaultLng);
+                    updateCoordinates(defaultLat, defaultLng);
+                }
+            );
+        } else {
+            initMap(defaultLat, defaultLng);
+            updateCoordinates(defaultLat, defaultLng);
+        }
+    });
+</script>

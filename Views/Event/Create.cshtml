@@ -1,0 +1,175 @@
+﻿@{
+    ViewData["Title"] = "Create Event";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartEventPlanningPlatform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="card shadow-lg p-4">
+            <h2 class="text-center mb-4">Etkinlik Oluştur</h2>
+            <form id="createEventForm" action="/Event/Create" method="post">
+                <div class="form-group mb-3">
+                    <label for="EventName" class="form-label">Etkinlik Adı</label>
+                    <input type="text" class="form-control" id="EventName" name="Name" placeholder="Enter event name" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label for="Description" class="form-label">Açıklama</label>
+                    <textarea class="form-control" id="Description" name="Description" rows="4" placeholder="Bir açıklama yaz" required></textarea>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="Location" class="form-label">Adres</label>
+                    <input type="text" class="form-control" id="Location" name="Location" placeholder="Adresi tarif et" required />
+                </div>
+
+                <!-- Hidden inputs for latitude and longitude -->
+                <input type="hidden" id="Latitude" name="Latitude" />
+                <input type="hidden" id="Longitude" name="Longitude" />
+
+                <div class="form-group mb-3">
+                    <label for="StartDate" class="form-label">Başlangıç Zamanı</label>
+                    <input type="datetime-local" class="form-control" id="StartDate" name="StartDate" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label for="EndDate" class="form-label">Bitiş Zamanı</label>
+                    <input type="datetime-local" class="form-control" id="EndDate" name="EndDate" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label for="EventPictureUrl" class="form-label">Etkinlik Resim URL</label>
+                    <input type="text" class="form-control" id="EventPictureUrl" name="EventPictureUrl" placeholder="url"  />
+                </div>
+                <div class="form-group mb-3">
+                    <label for="Category" class="form-label">Kategori</label>
+                    <select class="form-control" id="Category" name="Category" required>
+                        <option value="" disabled selected>Kategori seçin</option>
+                        @foreach (var category in ViewBag.Categories as List<string>)
+                        {
+                            <option value="@category">@category</option>
+                        }
+                    </select>
+                </div>
+
+
+                <div class="form-group mb-4">
+                    <label class="form-label">Etkinlik Konumu</label>
+                    <div id="map" class="map-container"></div>
+                    <small class="form-text text-muted d-block mt-2">Haritaya tıkla veya işareti kaydır.</small>
+                </div>
+
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Oluştur</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB0tZxPMNvJ7zwUAmCegFT1k6_Rg7A0dA"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const defaultLat = 40.768614;
+        const defaultLng = 29.940151;
+        let map, marker;
+
+        function initMap(lat, lng) {
+            const initialPosition = { lat: lat, lng: lng };
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: initialPosition,
+                zoom: 13,
+            });
+
+            marker = new google.maps.Marker({
+                position: initialPosition,
+                map: map,
+                draggable: true,
+            });
+
+            // Map click to move marker
+            map.addListener("click", function (event) {
+                marker.setPosition(event.latLng);
+                updateCoordinates(event.latLng.lat(), event.latLng.lng());
+            });
+
+            // Marker dragend
+            marker.addListener("dragend", function (event) {
+                updateCoordinates(event.latLng.lat(), event.latLng.lng());
+            });
+        }
+
+        function updateCoordinates(lat, lng) {
+            document.getElementById("Latitude").value = lat;
+            document.getElementById("Longitude").value = lng;
+        }
+
+        // Geolocation
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+                    initMap(userLat, userLng);
+                    updateCoordinates(userLat, userLng);
+                },
+                function () {
+                    initMap(defaultLat, defaultLng);
+                    updateCoordinates(defaultLat, defaultLng);
+                }
+            );
+        } else {
+            initMap(defaultLat, defaultLng);
+            updateCoordinates(defaultLat, defaultLng);
+        }
+
+        // Form submission with existing conflict check logic
+        const form = document.querySelector('#createEventForm');
+        if (form) {
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                try {
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const contentType = response.headers.get('Content-Type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const result = await response.json();
+                        if (result.success) {
+                            alert(result.message);
+                            window.location.href = "/Event/Dashboard";
+                        } else {
+                            if (result.conflicts && result.conflicts.length > 0) {
+                                const conflictMessages = result.conflicts.map(conflict =>
+                                    `${conflict.title}: ${new Date(conflict.startDate).toLocaleString('tr-TR')} - ${new Date(conflict.endDate).toLocaleString('tr-TR')}`
+                                ).join('\n');
+                                alert("Çakışan etkinlikler:\n" + conflictMessages);
+                            } else {
+                                alert(result.message);
+                            }
+                        }
+                    } else {
+                        const errorText = await response.text();
+                        alert("Sunucu yanıtı beklenen formatta değil: " + errorText);
+                    }
+                } catch (error) {
+                    console.error("Bir hata oluştu:", error);
+                    alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+                }
+            });
+        } else {
+            console.error("Form bulunamadı. Form ID'sini kontrol edin.");
+        }
+    });
+</script>
+</body>
+</html>

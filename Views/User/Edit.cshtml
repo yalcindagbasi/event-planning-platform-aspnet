@@ -1,0 +1,83 @@
+﻿@model SmartEventPlanningPlatform.Models.User
+
+<div class="container mt-4">
+    <h2>Profil Düzenleme</h2>
+    <hr />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <form asp-action="Edit" method="post">
+        @* Kullanıcının ID'sini gizli bir alanda tut *@
+        <input type="hidden" asp-for="UserId" />
+
+        <div class="form-group mb-3">
+            <label asp-for="Username" class="form-label">Kullanıcı Adı</label>
+            <input asp-for="Username" class="form-control" required />
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" required />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="FirstName" class="form-label">Ad</label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="LastName" class="form-label">Soyad</label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="PhoneNumber" class="form-label">Telefon Numarası</label>
+            <input asp-for="PhoneNumber" class="form-control" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Location" class="form-label">Konum</label>
+            <input asp-for="Location" class="form-control" />
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Interests" class="form-label">İlgi Alanları</label>
+            <textarea asp-for="Interests" class="form-control"></textarea>
+            <span asp-validation-for="Interests" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="BirthDate" class="form-label">Doğum Tarihi</label>
+            <input asp-for="BirthDate" type="date" class="form-control" />
+            <span asp-validation-for="BirthDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Gender" class="form-label">Cinsiyet</label>
+            <select asp-for="Gender" class="form-control">
+                <option value="">Seçiniz</option>
+                <option value="Male">Erkek</option>
+                <option value="Female">Kadın</option>
+                <option value="Other">Diğer</option>
+            </select>
+            <span asp-validation-for="Gender" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="ProfilePictureUrl" class="form-label">Profil Resmi URL</label>
+            <input asp-for="ProfilePictureUrl" class="form-control" />
+            <span asp-validation-for="ProfilePictureUrl" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Güncelle</button>
+    </form>
+</div>

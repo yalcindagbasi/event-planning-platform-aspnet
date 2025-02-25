@@ -1,0 +1,51 @@
+﻿ @model SmartEventPlanningPlatform.Models.Event
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartEventPlanningPlatform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+@{
+    ViewData["Title"] = "Edit Event";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Etkinliği Düzenle</h2>
+
+<form asp-action="Edit" method="post">
+    <div class="form-group">
+        <label asp-for="Title" class="control-label">Başlık</label>
+        <input asp-for="Title" class="form-control" value="@Model?.Title" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description" class="control-label">Açıklama</label>
+        <textarea asp-for="Description" class="form-control">@Model?.Description</textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Location" class="control-label">Adres</label>
+        <input asp-for="Location" class="form-control" value="@Model?.Location" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="StartDate" class="control-label">Başlangıç Zamanı</label>
+        <input asp-for="StartDate" class="form-control" type="datetime-local" value="@Model?.StartDate.ToString("yyyy-MM-ddTHH:mm")" />
+        <span asp-validation-for="StartDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EndDate" class="control-label">Bitiş Zamanı</label>
+        <input asp-for="EndDate" class="form-control" type="datetime-local" value="@Model?.EndDate.ToString("yyyy-MM-ddTHH:mm")" />
+        <span asp-validation-for="EndDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="hidden" name="eventId" value="@Model.EventId" />
+        <input type="submit" value="Kaydet" class="btn btn-primary" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Geri Dön</a>
+</div>
+

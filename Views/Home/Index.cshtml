@@ -1,0 +1,120 @@
+﻿@model SmartEventPlanningPlatform.Controllers.HomeViewModel
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartEventPlanningPlatform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/css/site.css" rel="stylesheet">
+    
+</head>
+<style>
+    .home-page .mt-4 {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 0;
+        padding-right: 0;
+    }
+</style>
+<body class="home-page">
+    <div class="mt-4">
+    <div class="container mt-5" style="width: 100%; max-width: 100%;">
+        <h1 class="text-center mb-4">Togethr Akıllı Etkinlik Planlama Platformu</h1>
+        <h3 class="text-center mb-4">Hoş geldiniz</h3>
+
+        <div class="row">
+                <h2 class="mb-4">Önerilen Etkinlikler</h2>
+                @if (Model.RecommendedEvents?.Any() == true)
+                {
+                    <div class="row">
+                        @foreach (var eventItem in Model.RecommendedEvents)
+                        {
+                            <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm event-card h-100">
+                                    <img src="@eventItem.ImageUrl" class="card-img-top" alt="Event Image">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="@Url.Action("Index", "Event", new { eventId = eventItem.EventId })" class="text-decoration-none">@eventItem.Title</a>
+                                        </h5>
+                                        <p class="card-text">@eventItem.Description.Substring(0, Math.Min(200, eventItem.Description.Length))...</p>
+                                        <div class="d-flex justify-content-between">
+                                            <small class="text-muted">Başlangıç: @eventItem.StartDate.ToString("dd/MM/yyyy")</small>
+                                            <small class="text-muted">Konum: @eventItem.Location</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p>Henüz önerilen etkinlik bulunmuyor.</p>
+                }
+            <!-- Orta Sütun: Tüm Etkinlikler -->
+            <div class="col-md-8">
+                <h2 class="mb-4">Tüm Etkinlikler</h2>
+                @if (Model.AllEvents?.Any() == true)
+                {
+                    <div class="row">
+                        @foreach (var eventItem in Model.AllEvents)
+                        {
+                            <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm event-card h-100">
+                                    <img src="@eventItem.ImageUrl" class="card-img-top" alt="Event Image">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="@Url.Action("Index", "Event", new { eventId = eventItem.EventId })" class="text-decoration-none">@eventItem.Title</a>
+                                        </h5>
+                                        <p class="card-text">@eventItem.Description.Substring(0, Math.Min(200, eventItem.Description.Length))...</p>
+                                        <div class="d-flex justify-content-between">
+                                            <small class="text-muted">Başlangıç: @eventItem.StartDate.ToString("dd/MM/yyyy")</small>
+                                            <small class="text-muted">Bitiş: @eventItem.EndDate.ToString("dd/MM/yyyy")</small>
+                                            <small class="text-muted">Konum: @eventItem.Location</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p>Henüz etkinlik bulunmuyor.</p>
+                }
+            </div>
+
+            <!-- Sağ Sütun: Kullanıcının Yaklaşan Etkinlikleri -->
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm upcoming-events-card">
+                    <div class="card-header">
+                        <h2 class="h5">Yaklaşan Etkinliklerim</h2>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        @if (Model.UserEvents?.Any() == true)
+                        {
+                            @foreach (var userEvent in Model.UserEvents)
+                            {
+                                <li class="list-group-item">
+                                    <h5>
+                                        <a href="@Url.Action("Index", "Event", new { eventId = userEvent.EventId })">
+                                            @userEvent.Title
+                                        </a>
+                                    </h5>
+                                    <small class="text-muted">Tarih: @userEvent.StartDate.ToString("dd/MM/yyyy")</small>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="list-group-item">Yaklaşan etkinliğiniz yok.</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</body>

@@ -1,0 +1,81 @@
+﻿@model SmartEventPlanningPlatform.Models.User
+
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartEventPlanningPlatform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" >
+    
+    
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card shadow-lg p-4">
+            <h2 class="text-center mb-4">User Profile</h2>
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <img src="@Model.ProfilePictureUrl" alt="Profile Picture" class="profile-picture img-thumbnail mb-3" />
+                    
+                    <p><strong>Kullanıcı Adı:</strong> @Model.Username</p>
+                    <p><strong>Eposta:</strong> @Model.Email</p>
+                    <div class="total-points">
+                        <h3>Toplam Puan: @ViewBag.TotalPoints</h3>
+                    </div>
+
+                </div>
+                <div class="col-md-8">
+                    <p><strong>Adı:</strong> @Model.FirstName</p>
+                    <p><strong>Soyadı:</strong> @Model.LastName</p>
+                    <p><strong>Hakkında:</strong> @Model.AboutMe</p>
+                    <p><strong>Telefon Numarası:</strong> @Model.PhoneNumber</p>
+                    <p><strong>Adresi:</strong> @Model.Location</p>
+                    <p><strong>İlgi Alanları:</strong> @Model.Interests</p>
+                    <p><strong>Doğum Tarihi:</strong> @Model.BirthDate.ToString("yyyy-MM-dd")</p>
+                    <p><strong>Cinsiyet:</strong> @Model.Gender</p>
+                    <p><strong>Hesap Oluşturulma Tarihi:</strong> @Model.CreatedAt</p>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h3 class="text-center">Konumu</h3>
+                <div id="map" class="map-container"></div>
+            </div>
+
+            @if (ViewBag.IsOwner)
+            {
+                <div class="mt-4 d-flex justify-content-center gap-2">
+                    <a asp-action="Edit" asp-controller="User" asp-route-userId="@Model.UserId" class="btn btn-primary">Profilini Düzenle</a>
+                    <a asp-action="Delete" asp-controller="User" asp-route-userId="@Model.UserId" class="btn btn-danger">Hesabını Sil</a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB0tZxPMNvJ7zwUAmCegFT1k6_Rg7A0dA"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            lat=@Model.Latitude
+            lng=@Model.Longitude
+
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat, lng },
+                zoom: 13,
+            });
+
+            new google.maps.Marker({
+                position: { lat, lng },
+                map: map,
+                title: "User Location",
+            });
+        });
+    </script>
+</body>
+</html>

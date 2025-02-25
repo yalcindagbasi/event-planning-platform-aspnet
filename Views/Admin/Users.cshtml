@@ -1,0 +1,39 @@
+﻿@model IEnumerable<SmartEventPlanningPlatform.Models.User>
+
+@{
+    ViewData["Title"] = "Kullanıcılar";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1 class="text-center mb-4">Kullanıcı Yönetimi</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Adı</th>
+                        <th>Email</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>@user.Username</td>
+                            <td>@user.Email</td>
+                            <td>
+                                <!-- Silme butonu -->
+                                <form method="post" action="@Url.Action("DeleteUser", "Admin", new { id = user.UserId })" onsubmit="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?');">
+                                    <button type="submit" class="btn btn-danger">Sil</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
