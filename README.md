@@ -68,11 +68,11 @@ dotnet run
 
 Kullanıcılar kullanıcı adı, şifre, e-posta ve diğer profil bilgilerini girerek kayıt olabilirler.
 
-### Event Recommendation
+### Etkinlik Önerisi
 Kullanıcılara profillerinde seçtikleri ilgi alanlarına göre önerilen etkinlikler gösterilir. Ayrıca tüm etkinlikleri ve yaklaşan etkinlikleri de görebilirler.
 ![2025-03-25 14 20 28 localhost 7a8de0a22a24](https://github.com/user-attachments/assets/6ec8f716-bb90-41cb-96e7-5ee457910d1d)
 
-### Event Management
+### Etkinlik Yönetimi
 Kullanıcılar etkinlik oluşturabilir, düzenleyebilir ve silebilir.  
 ![2025-03-25 13 52 36 localhost 85f5e832f07f](https://github.com/user-attachments/assets/da73ba7d-e142-4043-bb06-e4c321925aaf)
 
