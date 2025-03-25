@@ -27,6 +27,10 @@ public class MessageService
                     .Where(u => u.UserId == m.SenderId)
                     .Select(u => u.Username)
                     .FirstOrDefault() ?? string.Empty,
+                SenderProfilePictureUrl = _context.Users
+                    .Where(u => u.UserId == m.SenderId)
+                    .Select(u => u.ProfilePictureUrl)
+                    .FirstOrDefault() ?? string.Empty,
                 SentAt = m.SentAt
             })
             .ToList();

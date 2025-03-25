@@ -17,6 +17,7 @@ builder.Services.AddScoped<GamificationService>();
 builder.Services.AddScoped<UserService>(); // Register UserService
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
+builder.Configuration.AddUserSecrets<Program>();
 
 builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", options =>

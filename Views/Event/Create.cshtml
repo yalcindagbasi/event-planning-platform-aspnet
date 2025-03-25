@@ -2,6 +2,9 @@
     ViewData["Title"] = "Create Event";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+   @inject IConfiguration Configuration
+   @inject IConfiguration Configuration
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +76,7 @@
         </div>
     </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBB0tZxPMNvJ7zwUAmCegFT1k6_Rg7A0dA"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=@Configuration["maps_api_key"]"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const defaultLat = 40.768614;
