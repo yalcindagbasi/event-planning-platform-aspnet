@@ -1,6 +1,6 @@
 # Togethr (Akıllı Etkinlik Planlama Platformu)
 
-Togethr, .NET 8 kullanılarak oluşturulmuş bir web uygulamasıdır. Kullanıcıların etkinlik oluşturmasına, yönetmesine ve etkinliklere katılmasına olanak tanır. Platform ayrıca kullanıcı kimlik doğrulaması, mesajlaşma ve profil yönetimi için özellikler içerir.
+Togethr, .NET 8 kullanılarak oluşturulmuş bir web uygulamasıdır. Kullanıcıların etkinlik oluşturmasına, yönetmesine ve etkinliklere katılmasına olanak tanır. Platform ayrıca kullanıcı kimlik doğrulaması, mesajlaşma ve profil yönetimi için özellikler içerir. Proje Asp .Net MVC yapısını ve API kullanımını öğrenme amaçlı geliştirilmiştir.
 
 ## Özellikler
 
@@ -16,7 +16,7 @@ Togethr, .NET 8 kullanılarak oluşturulmuş bir web uygulamasıdır. Kullanıc�
 - .NET 8
 - Entity Framework Core
 - PostgreSQL
-- Google Haritalar API'si
+- Google Haritalar API
 - Bootstrap
 
 ## Başlarken
